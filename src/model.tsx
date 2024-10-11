@@ -65,7 +65,7 @@ interface WorkspaceView {
   isTyping: true;
 }
 
-const modelToView = (note: NoteModel, workspace: WorkspaceView) => {
+const noteModelToView = (note: NoteModel, workspace: WorkspaceView) => {
   return {
     x: note.x - workspace.x - workspace.relativeX / workspace.scale,
     y: note.y - workspace.y - workspace.relativeY / workspace.scale,
@@ -76,5 +76,5 @@ const modelToView = (note: NoteModel, workspace: WorkspaceView) => {
 
 export {
    NotesSearchOptions, WorkspacesPaginationOptions, Range, WorkspaceModel,
-   NoteModel, NoteView, WorkspaceView, BorderCollision, modelToView 
+   NoteModel, NoteView, WorkspaceView, BorderCollision, noteModelToView 
 }
