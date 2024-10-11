@@ -1,4 +1,4 @@
-import { Range } from "./model";
+import { Range } from "../model";
 
 interface SelectionBoxProps {
   selectionRange: Range;

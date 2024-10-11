@@ -1,8 +1,8 @@
 import { Accessor, Component } from 'solid-js';
-import { NoteView, NoteModel, Workspace, Range} from "./model";
+import { NoteView, NoteModel, WorkspaceView, Range} from "../model";
 
 interface TextProps {
-	workspace: Workspace;
+	workspace: WorkspaceView;
   selectionRange: Accessor<Range>;
 	noteView: Accessor<NoteView>;
 	note: NoteModel;

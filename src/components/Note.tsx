@@ -1,18 +1,18 @@
 import { Component } from "solid-js";
-import { Workspace, NoteModel, NoteView, Range, modelToView } from './model';
+import { WorkspaceView, NoteModel, NoteView, Range, modelToView } from '../model';
 import { Accessor, Switch, Match, Signal, createSignal } from 'solid-js';
 import Text from './Text'
 import BaseNote from "./BaseNote";
 import Image from './Image'
 import Video from './Video'
-import { proportionResize, resize } from "./resizing";
+import { proportionResize, resize } from "../resizing";
 
 interface NoteProps {
   note: NoteModel;
   setNote: (note: NoteModel) => void;
-  workspace: Workspace;
-  addToDeletionQueue: () => void;
-  deleteFromDeletionQueue: () => void;
+  workspace: WorkspaceView;
+  selectNote: () => void;
+  cancelSelection: () => void;
   selectionRange: Accessor<Range>
 }
 

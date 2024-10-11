@@ -1,6 +1,6 @@
 import { Accessor, Component, createSignal, onCleanup } from 'solid-js';
 import axios from 'axios';
-import { NoteView, NoteModel, Range } from "./model";
+import { NoteView, NoteModel, Range } from "../model";
 
 interface VideoProps {
   selectionRange: Accessor<Range>;

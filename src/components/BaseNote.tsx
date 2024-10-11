@@ -1,17 +1,17 @@
 import { Accessor, Component, Setter , createEffect, createMemo } from 'solid-js';
-import { NoteModel, Workspace, NoteView, modelToView, Range, BorderCollision} from './model';
-import dragg from "./dragging";
-import { getBorderCollision } from './border';
-import { checkIfInRange, detectCollision } from './utils'
+import { NoteModel, WorkspaceView, NoteView, modelToView, Range, BorderCollision} from '../model';
+import dragg from "../dragging";
+import { getBorderCollision } from '../border';
+import { checkIfInRange, detectCollision } from '../utils'
 
 interface BaseNoteProps {
   note: NoteModel;
   setNote: (note: NoteModel) => void;
-  workspace: Workspace;
+  workspace: WorkspaceView;
   noteView: Accessor<NoteView>;
   setNoteView: Setter<NoteView>;
-  addToDeletionQueue: () => void;
-  deleteFromDeletionQueue: () => void;
+  selectNote: () => void;
+  cancelSelection: () => void;
   selectionRange: Accessor<Range>;
   resize: (note: NoteView, eventX: number, eventY: number) => void;
   children: any
@@ -39,9 +39,9 @@ const BaseNote: Component<BaseNoteProps> = (props: BaseNoteProps) => {
 
   createEffect(() => {
     if (noteView().isSelected && props.selectionRange() === null) {
-      props.addToDeletionQueue();
+      props.selectNote();
     } else {
-      props.deleteFromDeletionQueue();
+      props.cancelSelection();
     }
   });
 
@@ -122,10 +122,8 @@ const BaseNote: Component<BaseNoteProps> = (props: BaseNoteProps) => {
   }
 
   return (
-    <div class={"note"}
+    <div class={"note absolute p-[10px]"}
       style={{
-        padding: "10px",
-        position: 'absolute',
         left: `${noteView().x - 10}px`,
         top: `${noteView().y - 10}px`,
         "z-index": noteView().zIndex
