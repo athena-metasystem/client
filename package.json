@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@solid-primitives/event-listener": "^2.3.3",
+    "@solid-primitives/event-props": "^0.2.7",
     "axios": "^1.7.2",
     "js-cookie": "^3.0.5",
     "solid-js": "^1.8.11"
