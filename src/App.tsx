@@ -3,9 +3,10 @@ import { WorkspaceView, NoteModel, NotesSearchOptions } from './model';
 import { fetchNotes, updateNote, deleteNote, createFile, createNote, deleteFile } from './server';
 import { calculateRange, checkIfRangeForUpdate } from './range';
 import { getVideoDimensions } from './files';
-import Note from './Note';
+import Note from './components/Note';
 import Cookies from 'js-cookie';
 import axios from 'axios'; 
+import SelectionBox from './components/SelectionBox';
 import WorkspaceList from './components/WorkspacesList';
 
 const App: Component = () => {
@@ -33,12 +34,15 @@ const App: Component = () => {
   
 
   const [fetchedNotes, setFetchedNotes] = createSignal([]);
+  const [searchOptions, setSearchOptions]: Signal<NotesSearchOptions> = createSignal();
+  const [selectionArea, setSelectionArea] = createSignal(null);
   const [isWorkspacesShown, setIsWorkspacesShown] = createSignal(false);
+  const [selectedNotes, setSelectedNotes]: Signal<Set<string>> = createSignal(new Set());
 
   let workspacesListAction: string = "move";
 
-  const [notes, { mutate }] = createResource(range, async (range, { value }: {value: Array<NoteModel>}) => {
-    const newNotes = await fetchNotes(range);
+  const [notes, { mutate }] = createResource(searchOptions, async (searchOptions, { value }: { value: Array<NoteModel> }) => {
+    let newNotes = await fetchNotes(searchOptions);
     value = value || [];
 
     const filteredNewNotes = newNotes.filter(newNote =>
@@ -46,7 +50,7 @@ const App: Component = () => {
     );
 
     try {
-      return [...value, ...filteredNewNotes];
+      return [...value, ...filteredNewNotes].sort((a: NoteModel, b: NoteModel) => parseInt(a.id) - parseInt(b.id));
     } finally {
       setFetchedNotes(newNotes);
     }
@@ -63,23 +67,12 @@ const App: Component = () => {
     mutate(newNotes.sort((a, b) => +a.id - +b.id));
   });
 
-  const [selectionRange, setSelectionRange] = createSignal(null);
+  const cookies: {string: any} = JSON.parse(Cookies.get(workspaceId) || "{}");
+  workspace.x = cookies["x"] || workspace.x;
+  workspace.y = cookies["y"] || workspace.y;
+  workspace.scale = cookies["scale"] || workspace.scale;
 
-  const xCookie: string = Cookies.get("x");
-  const yCookie: string = Cookies.get("y");
-  const scaleCookie: string = Cookies.get("scale");
-
-  if (xCookie != undefined) {
-    workspace.x = parseInt(xCookie, 10);
-  }
-  if (yCookie != undefined) {
-    workspace.y = parseInt(yCookie, 10);
-  }
-  if (scaleCookie != undefined) {
-    workspace.scale = parseFloat(scaleCookie);
-  }
-
-  setRange(calculateRange(workspace));
+  setSearchOptions({range: calculateRange(workspace), workspaceId: workspaceId});
   
   document.addEventListener("mousedown", (event: MouseEvent) => {
     if (isWorkspacesShown()) {
@@ -89,7 +82,7 @@ const App: Component = () => {
     if (event.button != 0) return;
 
     let isMoved = false;
-    setSelectionRange(undefined);
+    setSelectionArea(undefined);
 
     let startX = (event.x - workspace.relativeX) / workspace.scale;
     let startY = (event.y - workspace.relativeY) / workspace.scale;
@@ -100,8 +93,8 @@ const App: Component = () => {
       let x = (event.x - workspace.relativeX) / workspace.scale;
       let y = (event.y - workspace.relativeY) / workspace.scale;
       
-      setSelectionRange(undefined);
-      setSelectionRange({
+      setSelectionArea(undefined);
+      setSelectionArea({
           start: [Math.min(startX, x), Math.min(startY, y)],
           end: [Math.max(startX, x), Math.max(startY, y)]
       });
@@ -115,9 +108,13 @@ const App: Component = () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
 
-      setSelectionRange(isMoved ? null: undefined);
+      setSelectionArea(isMoved ? null: undefined);
     });
   });
+
+  document.addEventListener("wheel", event => {
+      event.preventDefault();
+  }, { passive: false });
 
   onMount(() => {
     const workspaceDOM = document.getElementById("workspace");
@@ -163,7 +160,7 @@ const App: Component = () => {
           document.documentElement.style.setProperty('--workspace-height', workspace.height / workspace.scale + "px");
 
           if (workspace.scale < 1) {
-            setRange(calculateRange(workspace));
+            setSearchOptions({range: calculateRange(workspace), workspaceId: workspaceId});
           }
         }
       } else {
@@ -177,13 +174,15 @@ const App: Component = () => {
         document.documentElement.style.setProperty('--workspace-left', -rect.x / workspace.scale + "px");
         document.documentElement.style.setProperty('--workspace-top', -rect.y / workspace.scale + "px");
 
-        if (checkIfRangeForUpdate(workspace, range())) {
-          setRange(calculateRange(workspace));
+        if (checkIfRangeForUpdate(workspace, searchOptions().range)) {
+          setSearchOptions({range: calculateRange(workspace), workspaceId: workspaceId});
         } 
       }
-      Cookies.set("x", workspace.x.toString());
-      Cookies.set("y", workspace.y.toString());
-      Cookies.set("scale", workspace.scale.toString());
+      Cookies.set(workspaceId, JSON.stringify({
+          x: workspace.x,
+          y: workspace.y,
+          scale: workspace.scale
+        }));
     }, { passive: false });
   })
 
@@ -213,8 +212,6 @@ const App: Component = () => {
       );
     }
   }); 
-
-  let deletionQueue: Set<string> = new Set();
 
   document.addEventListener("keydown", (event: KeyboardEvent) => {
     if (event.key === 'Backspace') {
@@ -359,10 +356,10 @@ const App: Component = () => {
               await updateNote(note);
               mutate(newNotes);
             }}
-            addToDeletionQueue={() => deletionQueue.add(note.id)}
-            deleteFromDeletionQueue={() => deletionQueue.delete(note.id)}
+            selectNote={() => setSelectedNotes((prev) => prev.add(note.id))}
+            cancelSelection={() => setSelectedNotes((prev) => (prev.delete(note.id), prev))}
             workspace={workspace}
-            selectionRange={selectionRange}/>
+            selectionRange={selectionArea}/>
         }
         </For>
       </div>
