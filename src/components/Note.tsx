@@ -1,5 +1,5 @@
 import { Component } from "solid-js";
-import { WorkspaceView, NoteModel, NoteView, Range, modelToView } from '../model';
+import { WorkspaceView, NoteModel, NoteView, Range, noteModelToView } from '../model';
 import { Accessor, Switch, Match, Signal, createSignal } from 'solid-js';
 import Text from './Text'
 import BaseNote from "./BaseNote";
@@ -23,7 +23,7 @@ const Note: Component<NoteProps> = (props: NoteProps) => {
     clickY: 0,
     border: { north: false as true, west: false as true, south: false as true, east: false as true },
     isSelected: false as true,
-    ...modelToView(props.note, props.workspace)
+    ...noteModelToView(props.note, props.workspace)
   });
 
   let dtype = props.note.dtype;

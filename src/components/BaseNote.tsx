@@ -1,5 +1,5 @@
 import { Accessor, Component, Setter , createEffect, createMemo } from 'solid-js';
-import { NoteModel, WorkspaceView, NoteView, modelToView, Range, BorderCollision} from '../model';
+import { NoteModel, WorkspaceView, NoteView, noteModelToView, Range, BorderCollision} from '../model';
 import dragg from "../dragging";
 import { getBorderCollision } from '../border';
 import { checkIfInRange, detectCollision } from '../utils'
@@ -25,7 +25,7 @@ const BaseNote: Component<BaseNoteProps> = (props: BaseNoteProps) => {
     const selectionRange = props.selectionRange();
     setNoteView((prev) => (
       {...prev, 
-        ...modelToView(props.note, props.workspace),
+        ...noteModelToView(props.note, props.workspace),
         isSelected: (selectionRange != null ? detectCollision({
           left: selectionRange.start[0], right: selectionRange.end[0],
           top: selectionRange.start[1], bottom: selectionRange.end[1]

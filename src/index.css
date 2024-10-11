@@ -27,3 +27,12 @@ code {
   width: var(--workspace-width, 100vw);
   height: var(--workspace-height, 100vh);
 }
+
+.add-workspace:hover svg path {
+    stroke: #2b7ec2;
+}
+
+.add-workspace:hover  {
+  border-color: #2b7ec2;
+}
+
