@@ -1,3 +1,13 @@
+interface NotesSearchOptions {
+  range: Range
+  workspaceId: string
+}
+
+interface WorkspacesPaginationOptions {
+  offset: number;
+  limit: number;
+}
+
 interface Range {
   start: [number, number];
   end: [number, number];
@@ -12,6 +22,13 @@ interface NoteModel {
   body: string;
   fileId: string;
   dtype: string;
+  workspaceId: string;
+}
+
+interface WorkspaceModel {
+  id: string;
+  name: string;
+  fileId: string;
 }
 
 interface NoteView {
@@ -33,7 +50,7 @@ interface BorderCollision {
   east: true
 }
 
-interface Workspace {
+interface WorkspaceView {
   x: number;
   y: number;
   relativeX: number;
@@ -48,7 +65,7 @@ interface Workspace {
   isTyping: true;
 }
 
-const modelToView = (note: NoteModel, workspace: Workspace) => {
+const modelToView = (note: NoteModel, workspace: WorkspaceView) => {
   return {
     x: note.x - workspace.x - workspace.relativeX / workspace.scale,
     y: note.y - workspace.y - workspace.relativeY / workspace.scale,
@@ -57,4 +74,7 @@ const modelToView = (note: NoteModel, workspace: Workspace) => {
   }
 }
 
-export {Range, NoteModel, NoteView, Workspace, BorderCollision, modelToView}
+export {
+   NotesSearchOptions, WorkspacesPaginationOptions, Range, WorkspaceModel,
+   NoteModel, NoteView, WorkspaceView, BorderCollision, modelToView 
+}

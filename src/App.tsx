@@ -1,17 +1,22 @@
 import { createSignal, Component, createResource, Signal, For, Show, onMount, createMemo, lazy, untrack} from 'solid-js';
-import { Workspace, Range, NoteModel } from './model';
+import { WorkspaceView, NoteModel, NotesSearchOptions } from './model';
 import { fetchNotes, updateNote, deleteNote, createFile, createNote, deleteFile } from './server';
 import { calculateRange, checkIfRangeForUpdate } from './range';
 import { getVideoDimensions } from './files';
 import Note from './Note';
 import Cookies from 'js-cookie';
 import axios from 'axios'; 
-import SelectionBox from './SelectionBox';
+import WorkspaceList from './components/WorkspacesList';
 
 const App: Component = () => {
   axios.defaults.baseURL = "http://localhost:80/api"; 
+  let workspaceId = window.location.pathname.slice(1);
 
-  const workspace: Workspace = {
+  if (workspaceId == "") {
+    return <></>
+  }
+  
+  const workspace: WorkspaceView = {
     x: Math.round(-window.outerWidth * 0.5),
     y: Math.round(-window.outerHeight * 0.5),
     relativeX: 0,
@@ -23,11 +28,14 @@ const App: Component = () => {
     scale: 1.0,
     isDragging: false as true,
     isResizing: false as true,
-    isTyping: false as true
+    isTyping: false as true 
   };
+  
 
   const [fetchedNotes, setFetchedNotes] = createSignal([]);
-  const [range, setRange]: Signal<Range> = createSignal();
+  const [isWorkspacesShown, setIsWorkspacesShown] = createSignal(false);
+
+  let workspacesListAction: string = "move";
 
   const [notes, { mutate }] = createResource(range, async (range, { value }: {value: Array<NoteModel>}) => {
     const newNotes = await fetchNotes(range);
@@ -74,6 +82,10 @@ const App: Component = () => {
   setRange(calculateRange(workspace));
   
   document.addEventListener("mousedown", (event: MouseEvent) => {
+    if (isWorkspacesShown()) {
+      return;
+    }
+
     if (event.button != 0) return;
 
     let isMoved = false;
@@ -184,7 +196,8 @@ const App: Component = () => {
       height: 100,
       body: "",
       fileId: "",
-      dtype: "text"
+      dtype: "text",
+      workspaceId: workspaceId
     }
     createNote(note).then(response => {
       note.id = response.noteId; 
@@ -193,7 +206,7 @@ const App: Component = () => {
   };
 
   document.addEventListener('keypress', (event) => {
-    if (["c", "\u0441"].includes(event.key.toLowerCase()) && !workspace.isTyping) {
+    if (["c", "\u0441"].includes(event.key.toLowerCase()) && !workspace.isTyping && !isWorkspacesShown()) {
       handleAddNote(
         Math.round(workspace.mouseX / workspace.scale + workspace.x),
         Math.round(workspace.mouseY / workspace.scale + workspace.y)
@@ -207,7 +220,7 @@ const App: Component = () => {
     if (event.key === 'Backspace') {
       let newNotes = [...notes()];
 
-      for (let id of deletionQueue) {
+      for (let id of selectedNotes()) {
         const note = newNotes.find(item => item.id === id);
         if (note.fileId) {
           deleteFile(note.fileId);
@@ -216,7 +229,13 @@ const App: Component = () => {
         deleteNote(id);
       }
       mutate(newNotes);
-      deletionQueue = new Set();
+      setSelectedNotes(new Set<string>());
+    } else if (event.key == "m" && !workspace.isTyping) {
+      workspacesListAction = "move";
+      setIsWorkspacesShown((prev) => !prev);
+    } else if (event.key == "t" && !workspace.isTyping) {
+      workspacesListAction = "transfer";
+      setIsWorkspacesShown((prev) => !prev);
     }
   });
 
@@ -226,6 +245,10 @@ const App: Component = () => {
 
   document.addEventListener("drop", async (event) => {
     event.preventDefault();
+
+    if (isWorkspacesShown()) {
+      return;
+    }
 
     const files = event.dataTransfer.files;
     let dtype: string;
@@ -255,7 +278,8 @@ const App: Component = () => {
       height: Math.round(height),
       body: "",
       fileId: data["fileId"], 
-      dtype: dtype
+      dtype: dtype,
+      workspaceId: workspaceId
     };
     let response = await createNote(note);
     note.id = response.noteId;
@@ -263,6 +287,10 @@ const App: Component = () => {
   });
 
   document.addEventListener("paste", async () => {
+    if (isWorkspacesShown()) {
+      return;
+    }
+
     const data = await navigator.clipboard.read();
     data.forEach(item => {
       item.types.forEach(async mimeType => {
@@ -283,7 +311,8 @@ const App: Component = () => {
             height: Math.round(height),
             body: "",
             fileId: data["fileId"], 
-            dtype: "image"
+            dtype: "image",
+            workspaceId: workspaceId
           };
           let response = await createNote(note);
           note.id = response.noteId;
@@ -295,15 +324,31 @@ const App: Component = () => {
 
   return (
     <>
-      <div id="workspace" style={{
-        position: "absolute",
-        width: workspace.width + "px",
-        height: workspace.height + "px",
-        transform: `scale(${workspace.scale})`,
-        "transform-origin": "top left"
-      }}>
-        <Show when={selectionRange() != null}>
-          <SelectionBox selectionRange={selectionRange()}/>
+      <Show when={isWorkspacesShown()}>
+        <div class='absolute flex w-screen h-screen items-center justify-center z-10 backdrop-blur-sm'>
+          <WorkspaceList show={setIsWorkspacesShown}
+            action={workspacesListAction}
+            transfer={async (workspaceId: string) => {
+              let newNotes = [...notes()];
+              for (let id of selectedNotes()) {
+                const note = newNotes.find(item => item.id === id);
+                note.workspaceId = workspaceId;
+                note.x = 0;
+                note.y = 0;
+                newNotes = newNotes.filter(item => item.id !== id);
+                await updateNote(note);
+              }
+              mutate(newNotes);
+              setSelectedNotes(new Set<string>());
+            }}></WorkspaceList>
+        </div>
+      </Show>
+
+      <div id="workspace" class={`absolute w-[${workspace.width}px] h-[${workspace.height}px] origin-top-left`} style={{
+          transform: `scale(${workspace.scale})`
+        }}>
+        <Show when={selectionArea() != null}>
+          <SelectionBox selectionRange={selectionArea()}/>
         </Show>
 
         <For each={notes()}>{(note, noteIndex) =>
