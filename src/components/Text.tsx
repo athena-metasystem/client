@@ -3,7 +3,7 @@ import { NoteView, NoteModel, WorkspaceView, Range } from "../model";
 
 interface TextProps {
   workspace: WorkspaceView;
-  selectionRange: Accessor<Range>;
+  selectionArea: Accessor<Range>;
   noteView: Accessor<NoteView>;
   note: NoteModel;
   setNote: (note: NoteModel) => void;
@@ -33,7 +33,7 @@ const Text: Component<TextProps> = (props: TextProps) => {
         height: `${noteView().height}px`,
         background: "#252525",
         border:
-          noteView().isSelected && props.selectionRange() === null
+          noteView().isSelected && props.selectionArea() === null
             ? "1px solid #ff4d00"
             : "none",
       }}

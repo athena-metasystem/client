@@ -32,17 +32,17 @@ const Note: Component<NoteProps> = (props: NoteProps) => {
     <Switch fallback={dtype}>
       <Match when={dtype == "text"}>
         <BaseNote {...props} noteView={noteView} setNoteView={setNoteView} resize={resize}>
-          <Text workspace={props.workspace} selectionRange={props.selectionArea} noteView={noteView} note={props.note} setNote={props.setNote}/>
+          <Text workspace={props.workspace} selectionArea={props.selectionArea} noteView={noteView} note={props.note} setNote={props.setNote}/>
         </BaseNote>
       </Match>
       <Match when={dtype == "image"}>
         <BaseNote {...props} noteView={noteView} setNoteView={setNoteView} resize={proportionResize}>
-          <Image selectionRange={props.selectionArea} noteView={noteView} note={props.note}/>
+          <Image selectionArea={props.selectionArea} noteView={noteView} note={props.note}/>
         </BaseNote>
       </Match>
       <Match when={dtype == "video"}>
         <BaseNote {...props} noteView={noteView} setNoteView={setNoteView} resize={proportionResize}>
-          <Video selectionRange={props.selectionArea} noteView={noteView} note={props.note}/>
+          <Video selectionArea={props.selectionArea} noteView={noteView} note={props.note}/>
         </BaseNote>
       </Match>
     </Switch>

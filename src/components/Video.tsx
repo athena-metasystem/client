@@ -1,9 +1,9 @@
-import { Accessor, Component, createSignal, onCleanup } from 'solid-js';
-import axios from 'axios';
+import { Accessor, Component, createSignal, onCleanup } from "solid-js";
+import axios from "axios";
 import { NoteView, NoteModel, Range } from "../model";
 
 interface VideoProps {
-  selectionRange: Accessor<Range>;
+  selectionArea: Accessor<Range>;
   noteView: Accessor<NoteView>;
   note: NoteModel;
 }
@@ -14,15 +14,19 @@ const Video: Component<VideoProps> = (props: VideoProps) => {
 
   const fetchVideo = async () => {
     try {
-      const response = await axios.get(`http://localhost:80/api/files/${props.note.fileId}`, {
-        responseType: 'blob'
+      const response = await axios.get(
+        `http://localhost:80/api/files/${props.note.fileId}`,
+        {
+          responseType: "blob",
+        }
+      );
+      const blob = new Blob([response.data], {
+        type: response.headers["content-type"],
       });
-      const blob = new Blob([response.data], { type: response.headers['content-type'] });
       const url = URL.createObjectURL(blob);
       setVideoUrl(url);
-
     } catch (error) {
-      console.error('Error fetching video:', error);
+      console.error("Error fetching video:", error);
     }
   };
 
@@ -37,10 +41,15 @@ const Video: Component<VideoProps> = (props: VideoProps) => {
       style={{
         "max-width": "none",
         "max-height": "none",
-        border: noteView().isSelected
-        && props.selectionRange() === null ? "1px solid #ff4d00" : "none"
-      }} draggable="false" controls>
-      {videoUrl() && <source src={videoUrl()} type="video/mp4"/>}
+        border:
+          noteView().isSelected && props.selectionArea() === null
+            ? "1px solid #ff4d00"
+            : "none",
+      }}
+      draggable="false"
+      controls
+    >
+      {videoUrl() && <source src={videoUrl()} type="video/mp4" />}
     </video>
   );
 };
