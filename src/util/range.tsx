@@ -1,5 +1,5 @@
-import { WorkspaceView, Range } from './model';
-import {checkIfInRange} from './utils'
+import { WorkspaceView, Range } from '../model';
+import { checkIfInRange } from './common'
 
 const calculateRangeBorder = (dimension: number, position: number, rangeZone: number): number => {
   return Math.round(dimension * (Math.trunc((position + 0.5 * dimension) / dimension) + rangeZone));
@@ -27,4 +27,4 @@ const checkIfRangeForUpdate = (workspace: WorkspaceView, range: Range): boolean 
   )
 }
 
-export {calculateRange, checkIfRangeForUpdate};
+export { calculateRange, checkIfRangeForUpdate };

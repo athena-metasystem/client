@@ -1,4 +1,4 @@
-import {NoteView} from "./model"
+import { NoteView } from "../model"
 
 
 interface DraggParams {

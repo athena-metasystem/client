@@ -1,5 +1,5 @@
-import {BorderCollision, NoteView, WorkspaceView} from "./model"
-import {checkIfInRange} from "./utils";
+import { BorderCollision, NoteView, WorkspaceView } from "../model"
+import { checkIfInRange } from "./common";
 
 const checkIfBorderCollision = (border: number, mousePos: Array<number>, lowerLimit: number, upperLimit: number) => {
   return checkIfInRange(mousePos[0], border - 2, border + 2) && checkIfInRange(mousePos[1], lowerLimit, upperLimit);
@@ -18,4 +18,4 @@ const getBorderCollision = (note: NoteView, workspace: WorkspaceView): BorderCol
   return border;
 }
 
-export {getBorderCollision};
+export { getBorderCollision };

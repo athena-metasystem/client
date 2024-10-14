@@ -6,7 +6,8 @@ import {
   Setter
 } from "solid-js";
 import { WorkspaceModel } from "../model";
-import { createFile, createWorkspace, deleteFile, updateWorkspace } from "../server";
+import { createWorkspace, updateWorkspace } from "../api/workspaces";
+import { createFile, deleteFile } from "../api/files";
 
 interface WorkspaceWindowProps {
   action: string;
@@ -105,8 +106,8 @@ const WorkspaceWindow: Component<WorkspaceWindowProps> = (props: WorkspaceWindow
         <div class="relative w-full h-full flex justify-center items-center overflow-clip">
           <Show when={imageSrc()} fallback={
             <>
-              <img src="images/drag-drop.png" class="absolute"/>
-              <img src="images/drag-drop-hover.png"
+              <img src="src/assets/drag-drop.png" class="absolute"/>
+              <img src="src/assets/drag-drop-hover.png"
                 class={`workspace-window-img absolute ${isDragging() ? "opacity-100": "opacity-0"}`}/>
             </>}>
             <img src={imageSrc()} class="aspect-auto"></img>

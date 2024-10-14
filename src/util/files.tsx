@@ -23,4 +23,4 @@ const getVideoDimensions = (file: Blob): Promise<{width: number, height: number}
     });
 }
 
-export {getVideoDimensions}
+export { getVideoDimensions }

@@ -5,7 +5,7 @@ import Text from './Text'
 import BaseNote from "./BaseNote";
 import Image from './Image'
 import Video from './Video'
-import { proportionResize, resize } from "../resizing";
+import { proportionResize, resize } from "../util/resizing";
 
 interface NoteProps {
   note: NoteModel;
@@ -13,7 +13,7 @@ interface NoteProps {
   workspace: WorkspaceView;
   selectNote: () => void;
   cancelSelection: () => void;
-  selectionRange: Accessor<Range>
+  selectionArea: Accessor<Range>
 }
 
 const Note: Component<NoteProps> = (props: NoteProps) => {
@@ -32,17 +32,17 @@ const Note: Component<NoteProps> = (props: NoteProps) => {
     <Switch fallback={dtype}>
       <Match when={dtype == "text"}>
         <BaseNote {...props} noteView={noteView} setNoteView={setNoteView} resize={resize}>
-          <Text workspace={props.workspace} selectionRange={props.selectionRange} noteView={noteView} note={props.note} setNote={props.setNote}/>
+          <Text workspace={props.workspace} selectionRange={props.selectionArea} noteView={noteView} note={props.note} setNote={props.setNote}/>
         </BaseNote>
       </Match>
       <Match when={dtype == "image"}>
         <BaseNote {...props} noteView={noteView} setNoteView={setNoteView} resize={proportionResize}>
-          <Image selectionRange={props.selectionRange} noteView={noteView} note={props.note}/>
+          <Image selectionRange={props.selectionArea} noteView={noteView} note={props.note}/>
         </BaseNote>
       </Match>
       <Match when={dtype == "video"}>
         <BaseNote {...props} noteView={noteView} setNoteView={setNoteView} resize={proportionResize}>
-          <Video selectionRange={props.selectionRange} noteView={noteView} note={props.note}/>
+          <Video selectionRange={props.selectionArea} noteView={noteView} note={props.note}/>
         </BaseNote>
       </Match>
     </Switch>

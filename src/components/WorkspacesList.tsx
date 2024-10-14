@@ -1,6 +1,6 @@
 import { Component, Signal, createSignal, createResource, For, Show, createEffect, untrack, Setter } from 'solid-js';
 import { WorkspaceModel, WorkspacesPaginationOptions } from '../model'
-import { fetchWorkspaces  } from '../server';
+import { fetchWorkspaces  } from '../api/workspaces';
 import WorkspaceWindow from './WorkspaceWindow';
 
 function checkImage(url: string) {
@@ -45,7 +45,7 @@ const WorkspaceList: Component<WorkspaceListProps> = (props: WorkspaceListProps)
   
   if (props.action == "move") {
     onAction = (event) => {
-      window.location.href = `http://localhost:3000/${event.currentTarget.dataset.value}`;
+      window.location.href = `/${event.currentTarget.dataset.value}`;
     };
   } else if (props.action == "transfer") {
     onAction = (event) => {
@@ -122,7 +122,7 @@ const WorkspaceList: Component<WorkspaceListProps> = (props: WorkspaceListProps)
                       setIsworksoaceWindowShown(true);
                     }
                   }>
-                    <img class="w-full h-full mix-blend-color-dodge" src='images/edit.png'></img>
+                    <img class="w-full h-full mix-blend-color-dodge" src='src/assets/edit.png'></img>
                   </div>
                 </div>
 
@@ -135,40 +135,7 @@ const WorkspaceList: Component<WorkspaceListProps> = (props: WorkspaceListProps)
           </For>
           <div class="add-workspace border border-[#414143] border-dashed rounded-md h-4/5 flex items-center justify-center">
             <button onClick={ () => (setWindowWorkspaceAction("create"), setIsworksoaceWindowShown(true)) } class="flex items-center justify-center w-full h-full">
-              <svg
-                width="100"
-                height="100"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M 40 40 L 40 0 L 60 0 L 60 40"
-                  fill="none"
-                  stroke="#636365"
-                  stroke-width="1"
-                  stroke-dasharray="4, 2.5"
-                />
-                <path
-                  d="M 60 40 L 100 40 L 100 60 L 60 60"
-                  fill="none"
-                  stroke="#636365"
-                  stroke-width="1"
-                  stroke-dasharray="4, 2.5"
-                />
-                <path
-                  d="M 60 60 L 60 100 L 40 100 L 40 60"
-                  fill="none"
-                  stroke="#636365"
-                  stroke-width="1"
-                  stroke-dasharray="4, 2.5"
-                />
-                <path
-                  d="M 40 60 L 0 60 L 0 40 L 40 40"
-                  fill="none"
-                  stroke="#636365"
-                  stroke-width="1"
-                  stroke-dasharray="4, 2.5"
-                />
-              </svg>
+              <img src="src/assets/add-ws.svg" alt="Add workspace"/>
             </button>
           </div>
         </div>

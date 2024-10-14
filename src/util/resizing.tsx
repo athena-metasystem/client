@@ -1,4 +1,4 @@
-import { NoteView } from "./model";
+import { NoteView } from "../model";
 
 const resize = (note: NoteView, eventX: number, eventY: number, aspectRatio: number=-1): void => {
   if (note.border.north) {
@@ -56,5 +56,5 @@ const proportionResize = (note: NoteView, eventX: number, eventY: number) => {
 }
 
 
-export {resize, proportionResize};
+export { resize, proportionResize };
 
