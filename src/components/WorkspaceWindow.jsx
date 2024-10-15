@@ -1,25 +1,14 @@
 import {
-  Component,
-  Signal,
   createSignal,
   Show,
-  Setter
 } from "solid-js";
-import { WorkspaceModel } from "../model";
 import { createWorkspace, updateWorkspace } from "../api/workspaces";
 import { createFile, deleteFile } from "../api/files";
 
-interface WorkspaceWindowProps {
-  action: string;
-  workspace: WorkspaceModel;
-  show:  Setter<boolean>;
-  updateWorkspaceList: () => void;
-}
-
-const WorkspaceWindow: Component<WorkspaceWindowProps> = (props: WorkspaceWindowProps) => {
+const WorkspaceWindow = (props) => {
   const [imageSrc, setImageSrc] = createSignal(null);
   const [isDragging, setIsDragging] = createSignal(false);
-  const [name, setName]: Signal<string> = createSignal("");
+  const [name, setName] = createSignal("");
   const [isTyping, setIsTyping] = createSignal(false);
 
   if (props.action == "update") {
@@ -55,7 +44,7 @@ const WorkspaceWindow: Component<WorkspaceWindowProps> = (props: WorkspaceWindow
     }
   }
 
-  const handleKeyboard = (event: KeyboardEvent) => {
+  const handleKeyboard = (event) => {
     if (isTyping()) {
       event.stopImmediatePropagation();
     }

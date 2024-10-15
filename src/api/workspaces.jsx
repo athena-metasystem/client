@@ -1,13 +1,6 @@
-import { WorkspaceModel, WorkspacesPaginationOptions } from "../model"
 import axios from "axios";
 
-interface Workspace {
-  id: string;
-  name: string;
-  file_id: string;
-}
-
-const converToWorkspaceModel = (workspace: Workspace): WorkspaceModel => {
+const converToWorkspaceModel = (workspace) => {
   return {
     id: workspace.id,
     name: workspace.name,
@@ -15,7 +8,7 @@ const converToWorkspaceModel = (workspace: Workspace): WorkspaceModel => {
   };
 };
 
-const convertToWorkspace = (workspace: WorkspaceModel): Workspace => {
+const convertToWorkspace = (workspace) => {
   return {
     id: workspace.id,
     name: workspace.name,
@@ -23,7 +16,7 @@ const convertToWorkspace = (workspace: WorkspaceModel): Workspace => {
   };
 };
 
-const createWorkspace = async (workspace: WorkspaceModel) => {
+const createWorkspace = async (workspace) => {
   const response = await axios.post(
     "/workspaces",
     convertToWorkspace(workspace)
@@ -31,9 +24,7 @@ const createWorkspace = async (workspace: WorkspaceModel) => {
   return response.data;
 };
 
-const fetchWorkspaces = async (
-  paginationOptions: WorkspacesPaginationOptions
-) => {
+const fetchWorkspaces = async (paginationOptions) => {
   let filter = `?`;
   if (!(paginationOptions.offset < 0)) {
     filter += `offset=${paginationOptions.offset}&`;
@@ -42,7 +33,7 @@ const fetchWorkspaces = async (
   if (!(paginationOptions.limit < 0)) {
     filter += `limit=${paginationOptions.limit}`;
   }
-  let response = await axios.get<Array<Workspace>>("/workspaces" + filter);
+  let response = await axios.get("/workspaces" + filter);
   let workspaces = response.data || [];
   return [
     workspaces.map((workspace) => converToWorkspaceModel(workspace)),
@@ -50,7 +41,7 @@ const fetchWorkspaces = async (
   ];
 };
 
-const updateWorkspace = async (workspace: WorkspaceModel) => {
+const updateWorkspace = async (workspace) => {
   await axios.patch(
     `workspaces/${workspace.id}`,
     convertToWorkspace(workspace)

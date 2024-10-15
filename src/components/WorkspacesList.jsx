@@ -1,9 +1,8 @@
-import { Component, Signal, createSignal, createResource, For, Show, createEffect, untrack, Setter } from 'solid-js';
-import { WorkspaceModel, WorkspacesPaginationOptions } from '../model'
+import { createSignal, createResource, For, Show, createEffect, untrack } from 'solid-js';
 import { fetchWorkspaces  } from '../api/workspaces';
 import WorkspaceWindow from './WorkspaceWindow';
 
-function checkImage(url: string) {
+function checkImage(url) {
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = function () {
@@ -21,27 +20,21 @@ const getRandomColor = () => {
   return colors[Math.floor(Math.random() * colors.length)];
 }
 
-interface WorkspaceListProps {
-  show: Setter<boolean>;
-  action: string;
-  transfer: CallableFunction
-}
-
-const WorkspaceList: Component<WorkspaceListProps> = (props: WorkspaceListProps) => { // turn off tab
-  const [paginationOptions, setPaginationOptions]: Signal<WorkspacesPaginationOptions> = createSignal()
-  const [workspacesResponse, { mutate }] = createResource(paginationOptions, fetchWorkspaces);
+const WorkspaceList = (props) => {
+  const [paginationOptions, setPaginationOptions] = createSignal()
+  const [workspacesResponse] = createResource(paginationOptions, fetchWorkspaces);
   const [currentPage, setCurrentPage] = createSignal(1);
   const [areThereImages, setAreThereImages] = createSignal({});
-  const [maxPage, setMaxPage]: Signal<number> = createSignal();
+  const [maxPage, setMaxPage] = createSignal();
   const pageSize = 7;
   const displayedPagesNumber = 6;
   const [pages, setPages] = createSignal([]);
 
   const [isworksoaceWindowShown, setIsworksoaceWindowShown] = createSignal(false);
   const [windowWorkspaceAction, setWindowWorkspaceAction] = createSignal("");
-  const [workspace, setWorkspace]: Signal<WorkspaceModel> = createSignal(undefined);
+  const [workspace, setWorkspace] = createSignal(undefined);
 
-  let onAction: (event) => void;
+  let onAction;
   
   if (props.action == "move") {
     onAction = (event) => {
@@ -54,7 +47,7 @@ const WorkspaceList: Component<WorkspaceListProps> = (props: WorkspaceListProps)
     }
   }
 
-  const checkWorkspaceImage = (fileId: string) => {
+  const checkWorkspaceImage = (fileId) => {
     if (fileId) {
       const imageUrl = `http://localhost:80/api/files/${fileId}`;
       checkImage(imageUrl).then((isThereImage) => {
@@ -72,14 +65,14 @@ const WorkspaceList: Component<WorkspaceListProps> = (props: WorkspaceListProps)
 
   createEffect(() => {
     if (workspacesResponse()) {
-      setMaxPage(Math.trunc((workspacesResponse()[1] as number - 1) / pageSize) + 1)
+      setMaxPage(Math.trunc((workspacesResponse()[1] - 1) / pageSize) + 1)
       const firstPage = (Math.floor((currentPage() - 1) / displayedPagesNumber)) * displayedPagesNumber;
       setPages(Array.from({ length: Math.min(displayedPagesNumber, untrack(maxPage) - firstPage) }, (_, i) => firstPage + i + 1));
     }
   })
 
-  const handlePageButtonClick = (event: MouseEvent) => {
-    const pageText = (event.target as HTMLButtonElement).textContent;
+  const handlePageButtonClick = (event) => {
+    const pageText = event.target.textContent;
     if (pageText == "⭢") {
       const firstPage = (Math.floor((currentPage() - 1) / displayedPagesNumber) + 1) * displayedPagesNumber + 1;
       setCurrentPage(firstPage);
@@ -102,7 +95,7 @@ const WorkspaceList: Component<WorkspaceListProps> = (props: WorkspaceListProps)
           </div>
         </Show>
         <div class="flex-grow grid grid-cols-4 grid-rows-2 gap-4 h-96 w-full rounded-md p-10">
-          <For each={(workspacesResponse() || [])?.at(0) as [WorkspaceModel]}>{(workspace) => {
+          <For each={(workspacesResponse() || [])?.at(0)}>{(workspace) => {
             createEffect(() => {
               checkWorkspaceImage(workspace.fileId);
             });

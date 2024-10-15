@@ -1,6 +1,4 @@
-import { NoteView } from "../model";
-
-const resize = (note: NoteView, eventX: number, eventY: number, aspectRatio: number=-1): void => {
+const resize = (note, eventX, eventY, aspectRatio = -1) => {
   if (note.border.north) {
     note.y = note.y + note.height;
     note.height = Math.max(note.y - eventY, 20);
@@ -30,7 +28,7 @@ const resize = (note: NoteView, eventX: number, eventY: number, aspectRatio: num
   }
 }
 
-const proportionResize = (note: NoteView, eventX: number, eventY: number) => {
+const proportionResize = (note, eventX, eventY) => {
   const aspectRatio = note.width / note.height;
   const width = note.width;
   const height = note.height;

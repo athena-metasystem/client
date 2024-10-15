@@ -1,4 +1,4 @@
-const getVideoDimensions = (file: Blob): Promise<{width: number, height: number}> => {
+const getVideoDimensions = (file) => {
     return new Promise((resolve, reject) => {
         if (!file.type.startsWith('video/')) {
             reject(new Error('Это не видео файл!'));
@@ -17,7 +17,7 @@ const getVideoDimensions = (file: Blob): Promise<{width: number, height: number}
             resolve({ width, height });
         });
 
-        video.addEventListener('error', (e) => {
+        video.addEventListener('error', () => {
             reject(new Error('Ошибка при загрузке видео.'));
         });
     });

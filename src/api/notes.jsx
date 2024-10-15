@@ -1,17 +1,6 @@
-import { NoteModel, NotesSearchOptions } from "../model";
 import axios from "axios";
 
-interface Note {
-  id: string;
-  position: [number, number];
-  size: [number, number];
-  body: string;
-  file_id: string;
-  dtype: string;
-  workspace_id: string;
-}
-
-const convertToNote = (note: NoteModel): Note => {
+const convertToNote = (note) => {
   return {
     id: note.id,
     position: [note.x, note.y],
@@ -23,7 +12,7 @@ const convertToNote = (note: NoteModel): Note => {
   };
 };
 
-const convertToNoteModel = (note: Note): NoteModel => {
+const convertToNoteModel = (note) => {
   return {
     id: note.id,
     x: note.position[0],
@@ -37,12 +26,12 @@ const convertToNoteModel = (note: Note): NoteModel => {
   };
 };
 
-const createNote = async (note: NoteModel) => {
+const createNote = async (note) => {
   const response = await axios.post("/notes", convertToNote(note));
   return response.data;
 };
 
-const fetchNotes = async (searchOptions: NotesSearchOptions) => {
+const fetchNotes = async (searchOptions) => {
   const range = searchOptions.range;
   let filter =
     range != undefined
@@ -52,16 +41,16 @@ const fetchNotes = async (searchOptions: NotesSearchOptions) => {
     ? `&workspaceId=${searchOptions.workspaceId}`
     : "";
 
-  let notes = (await axios.get<Array<Note>>("/notes" + filter)).data || [];
+  let notes = (await axios.get("/notes" + filter)).data || [];
 
   return notes.map((note) => convertToNoteModel(note));
 };
 
-const updateNote = async (note: NoteModel) => {
+const updateNote = async (note) => {
   await axios.put(`/notes/${note.id}`, convertToNote(note));
 };
 
-const deleteNote = async (noteId: string) => {
+const deleteNote = async (noteId) => {
   await axios.delete(`/notes/${noteId}`);
 };
 

@@ -1,15 +1,8 @@
-import { Accessor, Component, createSignal, onCleanup } from "solid-js";
+import { createSignal, onCleanup } from "solid-js";
 import axios from "axios";
-import { NoteView, NoteModel, Range } from "../model";
 
-interface VideoProps {
-  selectionArea: Accessor<Range>;
-  noteView: Accessor<NoteView>;
-  note: NoteModel;
-}
-
-const Video: Component<VideoProps> = (props: VideoProps) => {
-  const [videoUrl, setVideoUrl] = createSignal<string | undefined>(undefined);
+const Video = (props) => {
+  const [videoUrl, setVideoUrl] = createSignal(undefined);
   const noteView = props.noteView;
 
   const fetchVideo = async () => {

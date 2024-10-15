@@ -1,36 +1,16 @@
 import {
-  Accessor,
-  Component,
-  Setter,
   createEffect,
   createMemo,
 } from "solid-js";
 import {
-  NoteModel,
-  WorkspaceView,
-  NoteView,
-  noteModelToView,
-  Range,
+  noteModelToView
 } from "../model";
 import dragg from "../util/dragging";
 import { getBorderCollision } from "../util/border";
 import detectCollision from "../util/collistions";
 import { checkIfInRange } from "../util/common";
 
-interface BaseNoteProps {
-  note: NoteModel;
-  setNote: (note: NoteModel) => void;
-  workspace: WorkspaceView;
-  noteView: Accessor<NoteView>;
-  setNoteView: Setter<NoteView>;
-  selectNote: () => void;
-  cancelSelection: () => void;
-  selectionArea: Accessor<Range>;
-  resize: (note: NoteView, eventX: number, eventY: number) => void;
-  children: any;
-}
-
-const BaseNote: Component<BaseNoteProps> = (props: BaseNoteProps) => {
+const BaseNote = (props) => {
   const noteView = props.noteView;
   const setNoteView = props.setNoteView;
 
@@ -54,7 +34,7 @@ const BaseNote: Component<BaseNoteProps> = (props: BaseNoteProps) => {
               bottom: prev.y + prev.height,
             }
           )
-        : prev.isSelected) as true,
+        : prev.isSelected),
     }));
   });
 
@@ -66,7 +46,7 @@ const BaseNote: Component<BaseNoteProps> = (props: BaseNoteProps) => {
     }
   });
 
-  const handleMouseDown = (event: MouseEvent): void => {
+  const handleMouseDown = (event) => {
     if (event.button != 0) return;
     const note = { ...noteView(), zIndex: 2 };
 
@@ -75,7 +55,7 @@ const BaseNote: Component<BaseNoteProps> = (props: BaseNoteProps) => {
     const eventY =
       (event.y - props.workspace.relativeY) / props.workspace.scale;
 
-    const handleMouseMove = (event: MouseEvent): void => {
+    const handleMouseMove = (event) => {
       const eventX =
         (event.x - props.workspace.relativeX) / props.workspace.scale;
       const eventY =
@@ -104,15 +84,15 @@ const BaseNote: Component<BaseNoteProps> = (props: BaseNoteProps) => {
       props.setNote(props.note);
     };
 
-    const handleMouseUp = (): void => {
+    const handleMouseUp = () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
 
       note.zIndex = 1;
 
       setNoteView({ ...note });
-      props.workspace.isDragging = false as true;
-      props.workspace.isResizing = false as true;
+      props.workspace.isDragging = false;
+      props.workspace.isResizing = false;
       document.body.style.cursor = "default";
     };
 
@@ -138,12 +118,12 @@ const BaseNote: Component<BaseNoteProps> = (props: BaseNoteProps) => {
     setNoteView({ ...note });
   };
 
-  const handleMouseMove = (): void => {
+  const handleMouseMove = () => {
     const note = { ...noteView() };
 
     if (!props.workspace.isDragging && !props.workspace.isResizing) {
       note.border = getBorderCollision(note, props.workspace);
-      let cursor: string;
+      let cursor;
       if (
         (note.border.north && note.border.west) ||
         (note.border.south && note.border.east)

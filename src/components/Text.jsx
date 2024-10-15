@@ -1,17 +1,6 @@
-import { Accessor, Component } from "solid-js";
-import { NoteView, NoteModel, WorkspaceView, Range } from "../model";
-
-interface TextProps {
-  workspace: WorkspaceView;
-  selectionArea: Accessor<Range>;
-  noteView: Accessor<NoteView>;
-  note: NoteModel;
-  setNote: (note: NoteModel) => void;
-}
-
-const Text: Component<TextProps> = (props: TextProps) => {
+const Text = (props) => {
   const noteView = props.noteView;
-  let textarea: any;
+  let textarea;
 
   const handleInput = () => {
     props.note.body = textarea.value;
@@ -23,7 +12,7 @@ const Text: Component<TextProps> = (props: TextProps) => {
   };
 
   const handleFocusOut = () => {
-    props.workspace.isTyping = false as true;
+    props.workspace.isTyping = false;
   };
 
   return (

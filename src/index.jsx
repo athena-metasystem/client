@@ -13,13 +13,14 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 }
 
 const start = async () => {
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     if (window.outerWidth != 0 && window.outerWidth != 0) {
       break;
     }
     await new Promise((r) => setTimeout(r, 100));
   }
-  render(() => <App />, root!);
+  render(() => <App />, root);
 };
 
 start();

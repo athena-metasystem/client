@@ -1,15 +1,12 @@
 import {
   createSignal,
-  Component,
   createResource,
-  Signal,
   For,
   Show,
   onMount,
   createMemo,
   untrack,
 } from "solid-js";
-import { WorkspaceView, NoteModel, NotesSearchOptions } from "../model";
 import { fetchNotes, updateNote, deleteNote, createNote } from "../api/notes";
 import { createFile, deleteFile } from "../api/files";
 import { calculateRange, checkIfRangeForUpdate } from "../util/range";
@@ -20,11 +17,11 @@ import SelectionBox from "../components/SelectionArea";
 import WorkspaceList from "../components/WorkspacesList";
 import { useParams } from "@solidjs/router";
 
-const Workspace: Component = () => {
+const Workspace = () => {
   const params = useParams();
   const id = params.id;
 
-  const workspace: WorkspaceView = {
+  const workspace = {
     x: Math.round(-window.outerWidth * 0.5),
     y: Math.round(-window.outerHeight * 0.5),
     relativeX: 0,
@@ -34,25 +31,24 @@ const Workspace: Component = () => {
     mouseX: 0,
     mouseY: 0,
     scale: 1.0,
-    isDragging: false as true,
-    isResizing: false as true,
-    isTyping: false as true,
+    isDragging: false,
+    isResizing: false,
+    isTyping: false,
   };
 
   const [fetchedNotes, setFetchedNotes] = createSignal([]);
-  const [searchOptions, setSearchOptions]: Signal<NotesSearchOptions> =
-    createSignal();
+  const [searchOptions, setSearchOptions] = createSignal();
   const [selectionArea, setSelectionArea] = createSignal(null);
   const [isWorkspacesShown, setIsWorkspacesShown] = createSignal(false);
-  const [selectedNotes, setSelectedNotes]: Signal<Set<string>> = createSignal(
+  const [selectedNotes, setSelectedNotes] = createSignal(
     new Set()
   );
 
-  let workspacesListAction: string = "move";
+  let workspacesListAction = "move";
 
   const [notes, { mutate }] = createResource(
     searchOptions,
-    async (searchOptions, { value }: { value: Array<NoteModel> }) => {
+    async (searchOptions, { value }) => {
       let newNotes = await fetchNotes(searchOptions);
       value = value || [];
 
@@ -63,7 +59,7 @@ const Workspace: Component = () => {
 
       try {
         return [...value, ...filteredNewNotes].sort(
-          (a: NoteModel, b: NoteModel) => parseInt(a.id) - parseInt(b.id)
+          (a, b) => parseInt(a.id) - parseInt(b.id)
         );
       } finally {
         setFetchedNotes(newNotes);
@@ -86,7 +82,7 @@ const Workspace: Component = () => {
     mutate(newNotes.sort((a, b) => +a.id - +b.id));
   });
 
-  const cookies: { string: any } = JSON.parse(Cookies.get(id) || "{}");
+  const cookies = JSON.parse(Cookies.get(id) || "{}");
   workspace.x = cookies["x"] || workspace.x;
   workspace.y = cookies["y"] || workspace.y;
   workspace.scale = cookies["scale"] || workspace.scale;
@@ -96,7 +92,7 @@ const Workspace: Component = () => {
     workspaceId: id,
   });
 
-  document.addEventListener("mousedown", (event: MouseEvent) => {
+  document.addEventListener("mousedown", (event) => {
     if (isWorkspacesShown()) {
       return;
     }
@@ -109,7 +105,7 @@ const Workspace: Component = () => {
     let startX = (event.x - workspace.relativeX) / workspace.scale;
     let startY = (event.y - workspace.relativeY) / workspace.scale;
 
-    const handleMouseMove = (event: MouseEvent) => {
+    const handleMouseMove = (event) => {
       isMoved = true;
 
       let x = (event.x - workspace.relativeX) / workspace.scale;
@@ -162,7 +158,7 @@ const Workspace: Component = () => {
       workspace.height / workspace.scale + "px"
     );
 
-    workspaceDOM.addEventListener("mousemove", (event: MouseEvent) => {
+    workspaceDOM.addEventListener("mousemove", (event) => {
       workspace.mouseX = event.x;
       workspace.mouseY = event.y;
       if (!workspace.isResizing && !workspace.isDragging) {
@@ -172,7 +168,7 @@ const Workspace: Component = () => {
 
     workspaceDOM.addEventListener(
       "wheel",
-      (event: WheelEvent) => {
+      (event) => {
         const workspaceDOM = document.getElementById("workspace");
         event.preventDefault();
         document.body.style.cursor = "default";
@@ -259,8 +255,8 @@ const Workspace: Component = () => {
     );
   });
 
-  const handleAddNote = async (mouseX: number, mouseY: number) => {
-    let note: NoteModel = {
+  const handleAddNote = async (mouseX, mouseY) => {
+    let note = {
       id: undefined,
       x: mouseX - 100,
       y: mouseY - 50,
@@ -290,7 +286,7 @@ const Workspace: Component = () => {
     }
   });
 
-  document.addEventListener("keydown", (event: KeyboardEvent) => {
+  document.addEventListener("keydown", (event) => {
     if (event.key === "Backspace") {
       let newNotes = [...notes()];
 
@@ -303,7 +299,7 @@ const Workspace: Component = () => {
         deleteNote(id);
       }
       mutate(newNotes);
-      setSelectedNotes(new Set<string>());
+      setSelectedNotes(new Set());
     } else if (event.key == "m" && !workspace.isTyping) {
       workspacesListAction = "move";
       setIsWorkspacesShown((prev) => !prev);
@@ -325,9 +321,9 @@ const Workspace: Component = () => {
     }
 
     const files = event.dataTransfer.files;
-    let dtype: string;
-    let width: number;
-    let height: number;
+    let dtype;
+    let width;
+    let height;
     if (files[0].type.startsWith("image")) {
       dtype = "image";
       const bmp = await createImageBitmap(files[0]);
@@ -344,7 +340,7 @@ const Workspace: Component = () => {
     let formData = new FormData();
     formData.append("file", files[0]);
     const data = await createFile(formData);
-    let note: NoteModel = {
+    let note = {
       id: undefined,
       x: Math.round(
         workspace.mouseX / workspace.scale + workspace.x - width * 0.5
@@ -381,7 +377,7 @@ const Workspace: Component = () => {
           formData.append("file", blob, "image.png");
 
           const data = await createFile(formData);
-          let note: NoteModel = {
+          let note = {
             id: undefined,
             x: Math.round(
               workspace.mouseX / workspace.scale + workspace.x - width * 0.5
@@ -411,7 +407,7 @@ const Workspace: Component = () => {
           <WorkspaceList
             show={setIsWorkspacesShown}
             action={workspacesListAction}
-            transfer={async (workspaceId: string) => {
+            transfer={async (workspaceId) => {
               let newNotes = [...notes()];
               for (let id of selectedNotes()) {
                 const note = newNotes.find((item) => item.id === id);
@@ -422,7 +418,7 @@ const Workspace: Component = () => {
                 await updateNote(note);
               }
               mutate(newNotes);
-              setSelectedNotes(new Set<string>());
+              setSelectedNotes(new Set());
             }}
           ></WorkspaceList>
         </div>
@@ -443,7 +439,7 @@ const Workspace: Component = () => {
           {(note, noteIndex) => (
             <Note
               note={note}
-              setNote={async (note: NoteModel) => {
+              setNote={async (note) => {
                 const newNotes = [...notes()];
                 newNotes[noteIndex()] = note;
                 await updateNote(note);

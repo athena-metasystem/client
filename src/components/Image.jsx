@@ -1,13 +1,4 @@
-import { Accessor, Component } from "solid-js";
-import { NoteView, NoteModel, Range } from "../model";
-
-interface ImageProps {
-  selectionArea: Accessor<Range>;
-  noteView: Accessor<NoteView>;
-  note: NoteModel;
-}
-
-const Image: Component<ImageProps> = (props: ImageProps) => {
+const Image = (props) => {
   const noteView = props.noteView;
 
   return (

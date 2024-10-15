@@ -1,11 +1,10 @@
-import { WorkspaceView, Range } from '../model';
 import { checkIfInRange } from './common'
 
-const calculateRangeBorder = (dimension: number, position: number, rangeZone: number): number => {
+const calculateRangeBorder = (dimension, position, rangeZone) => {
   return Math.round(dimension * (Math.trunc((position + 0.5 * dimension) / dimension) + rangeZone));
 }
 
-const calculateRange = (workspace: WorkspaceView): Range => {
+const calculateRange = (workspace) => {
   let scale = workspace.scale < 1 ? workspace.scale : 1;
   return {
       start: [
@@ -19,7 +18,7 @@ const calculateRange = (workspace: WorkspaceView): Range => {
   }
 }
 
-const checkIfRangeForUpdate = (workspace: WorkspaceView, range: Range): boolean => {
+const checkIfRangeForUpdate = (workspace, range) => {
   let scale = workspace.scale < 1 ? workspace.scale : 1;
   return (
     !checkIfInRange(workspace.x, range.start[0], range.start[0] + workspace.width / scale * 4)

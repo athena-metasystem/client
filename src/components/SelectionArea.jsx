@@ -1,10 +1,4 @@
-import { Range } from "../model";
-
-interface SelectionBoxProps {
-  selectionRange: Range;
-}
-
-const SelectionBox = (props: SelectionBoxProps) => {
+const SelectionBox = (props) => {
   const { start, end } = props.selectionRange;
   
   return (

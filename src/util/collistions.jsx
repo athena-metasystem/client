@@ -1,11 +1,4 @@
-interface Rect {
-  left: number;
-  right: number;
-  top: number;
-  bottom: number;
-}
-
-const detectCollision = (rect1: Rect, rect2: Rect): boolean =>
+const detectCollision = (rect1, rect2) =>
   rect1.left < rect2.right &&
   rect1.right > rect2.left &&
   rect1.top < rect2.bottom &&

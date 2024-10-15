@@ -1,28 +1,18 @@
-import { Component } from "solid-js";
-import { WorkspaceView, NoteModel, NoteView, Range, noteModelToView } from '../model';
-import { Accessor, Switch, Match, Signal, createSignal } from 'solid-js';
+import { noteModelToView } from '../model';
+import { Switch, Match, createSignal } from 'solid-js';
 import Text from './Text'
 import BaseNote from "./BaseNote";
 import Image from './Image'
 import Video from './Video'
 import { proportionResize, resize } from "../util/resizing";
 
-interface NoteProps {
-  note: NoteModel;
-  setNote: (note: NoteModel) => void;
-  workspace: WorkspaceView;
-  selectNote: () => void;
-  cancelSelection: () => void;
-  selectionArea: Accessor<Range>
-}
-
-const Note: Component<NoteProps> = (props: NoteProps) => {
-  const [noteView, setNoteView]: Signal<NoteView> = createSignal({
+const Note= (props) => {
+  const [noteView, setNoteView] = createSignal({
     zIndex: 1,
     clickX: 0,
     clickY: 0,
-    border: { north: false as true, west: false as true, south: false as true, east: false as true },
-    isSelected: false as true,
+    border: { north: false, west: false, south: false, east: false },
+    isSelected: false,
     ...noteModelToView(props.note, props.workspace)
   });
 
